@@ -2,7 +2,7 @@
 const WebSocket = require('ws');
 const http = require('http');
 
-import express from 'express'
+const express = require('express')
 
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
