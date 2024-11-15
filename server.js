@@ -2,10 +2,19 @@
 const WebSocket = require('ws');
 const http = require('http');
 
+import express from 'express'
+
 const server = http.createServer();
 const wss = new WebSocket.Server({ server });
 
 let numerosSorteados = [];
+
+const app = express(server)
+
+
+app.get('/', (req, res) => {
+    res.send('Servidor rodando!')
+})
 
 wss.on('connection', (ws) => {
     console.log('Cliente conectado.');
