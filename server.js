@@ -46,4 +46,6 @@ wss.on('connection', (ws) => {
 server.listen({
     port: 8080,
     host: '0.0.0.0'
+}, () => {
+    console.log('Servidor rodando em http://localhost:8080');
 });
