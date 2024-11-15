@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteador AMM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="bg-black text-zinc-100">
+    <main class="flex flex-col min-h-screen items-center justify-center">
+        <img src="./assets/logo.png" class="size-40 object-cover" alt="Logo">
+
+        <div class="flex flex-col items-center mt-12">
+            <span class="text-xl">Número Sorteado:</span>
+            <h1 id="current-number" class="text-[300px] font-bold -mt-24">-</h1>
+            <div id="loading" class="text-2xl mt-4 hidden">Sorteando...</div>
+        </div>
+
+        <div class="flex flex-col mt-8">
+            <button onclick="sorteiaNumero()" class="bg-green-600 hover:bg-green-500 text-zinc-100 px-6 py-2 rounded">
+                Sortear Número
+            </button>
+        </div>
+
+        <div class="flex flex-col mt-8">
+            <span class="text-2xl">Últimos números sorteados</span>
+            <div id="sorteados-container" class="grid grid-cols-6 gap-5 mt-2.5">
+                <!-- Números sorteados serão exibidos aqui -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let numerosSorteados = [];
+
+        function sorteiaNumero() {
+            if (numerosSorteados.length >= 180) {
+                alert("Todos os números entre 1 e 180 já foram sorteados!");
+                return;
+            }
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('current-number').textContent = '-';
+
+            // Simula o tempo de carregamento antes de mostrar o número
+            setTimeout(() => {
+                let numero;
+                do {
+                    // Gera um número aleatório entre 1 e 180
+                    numero = Math.floor(Math.random() * 180) + 1;
+                } while (numerosSorteados.includes(numero));
+
+                numerosSorteados.push(numero);
+                document.getElementById('current-number').textContent = numero;
+                document.getElementById('loading').classList.add('hidden');
+
+                // Exibe confetes ao sortear o número
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+
+                // Adiciona o novo número à lista de números sorteados
+                const novoNumeroDiv = document.createElement('div');
+                novoNumeroDiv.textContent = numero;
+                novoNumeroDiv.classList.add('flex', 'text-3xl', 'items-center', 'justify-center', 'rounded', 'bg-zinc-600', 'px-6', 'py-4');
+                document.getElementById('sorteados-container').appendChild(novoNumeroDiv);
+
+            }, 2000); // Tempo de "carregamento" de 2 segundos
+        }
+    </script>
+
+</body>
+
+</html>

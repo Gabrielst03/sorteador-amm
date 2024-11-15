@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteador AMM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="bg-black text-zinc-100">
+    <main class="flex flex-col min-h-screen items-center justify-center">
+        <img src="./assets/logo.png" class="size-40 object-cover" alt="Logo">
+
+        <div class="flex flex-col items-center mt-12">
+            <span class="text-xl">Número Sorteado:</span>
+            <h1 id="current-number" class="text-[300px] font-bold -mt-24">-</h1>
+            <div id="loading" class="text-2xl mt-4 hidden">Sorteando...</div>
+        </div>
+
+        <div class="flex flex-col mt-8">
+            <button onclick="sorteiaNumero()" class="bg-green-600 hover:bg-green-500 text-zinc-100 px-6 py-2 rounded">
+                Sortear Número
+            </button>
+        </div>
+    </main>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8080');
+
+        socket.onopen = () => {
+            console.log('Conectado ao servidor WebSocket');
+        };
+
+        function sorteiaNumero() {
+            socket.send(JSON.stringify({ type: 'sortear' }));
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('current-number').textContent = '-';
+        }
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'newNumber') {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('current-number').textContent = data.data;
+
+                // Exibe confetes ao sortear o número
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else if (data.type === 'error') {
+                alert(data.message);
+            }
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exibição dos Números</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="bg-black text-zinc-100">
+    <main class="flex flex-col min-h-screen items-center justify-center">
+        <img src="./assets/logo.png" class="size-40 object-cover" alt="Logo">
+
+        <div class="flex flex-col items-center mt-12">
+            <span class="text-xl">Número Sorteado:</span>
+            <h1 id="current-number" class="text-[300px] font-bold -mt-24">-</h1>
+            <div id="loading" class="text-2xl mt-4 hidden">Sorteando...</div>
+        </div>
+
+        <div class="flex flex-col mt-8">
+            <span class="text-2xl">Últimos números sorteados</span>
+            <div id="sorteados-container" class="grid grid-cols-6 gap-5 mt-2.5">
+                <!-- Números sorteados serão exibidos aqui -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8080');
+
+        socket.onopen = () => {
+            console.log('Conectado ao servidor WebSocket');
+        };
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            if (data.type === 'newNumber') {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('current-number').textContent = data.data;
+
+                // Exibe confetes ao receber um novo número
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+
+                // Adiciona o novo número à lista de números sorteados
+                const novoNumeroDiv = document.createElement('div');
+                novoNumeroDiv.textContent = data.data;
+                novoNumeroDiv.classList.add('flex', 'text-3xl', 'items-center', 'justify-center', 'rounded', 'bg-zinc-600', 'px-6', 'py-4');
+                document.getElementById('sorteados-container').appendChild(novoNumeroDiv);
+            } else if (data.type === 'history') {
+                data.data.forEach((numero) => {
+                    const numeroDiv = document.createElement('div');
+                    numeroDiv.textContent = numero;
+                    numeroDiv.classList.add('flex', 'text-3xl', 'items-center', 'justify-center', 'rounded', 'bg-zinc-600', 'px-6', 'py-4');
+                    document.getElementById('sorteados-container').appendChild(numeroDiv);
+                });
+            }
+        };
+    </script>
+</body>
+
+</html>
